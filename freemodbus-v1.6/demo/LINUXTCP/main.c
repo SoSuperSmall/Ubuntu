@@ -34,7 +34,7 @@ extern void *pthread_modbus(void *fd);
 struct header
 {
 	short type;
-	char ip[19];
+	char ip[16];
 	short length;
 	char tdata[526];
 };
@@ -42,7 +42,7 @@ struct header
 struct msbuf
 {
 	long type;
-	char ip[19];
+	char ip[16];
 };
 
 
@@ -68,7 +68,7 @@ void daiding();
 struct msgstr  
 {  
    long msgtype;  
-   char msgtext[2048];   
+   char msgtext[1024];   
 }; 
 
 
@@ -76,7 +76,7 @@ struct msgstr
 struct mac
 {
 	char name[10];
-	char ipaddr[19];
+	char ipaddr[16];
 }strmac;
 
 struct mac macList[6];         //结构体数组，存储多个网卡信息
@@ -89,7 +89,7 @@ void InitArray()
 	for(j = 0;j<6;j++)
 	{
 		strcpy(macList[j].name,"1");
-		//strcpy(macList[j].ipaddr,"1");
+		strcpy(macList[j].ipaddr,"1");
 	}
 }
 
@@ -134,7 +134,7 @@ int get_local_ip(char *ip)
 int main(int argc,char *argv[])
 {
 	InitArray();
-	char ip[19];
+	char ip[16];
 	memset(ip,0,sizeof(ip));
 	get_local_ip(ip);
 	int count;
@@ -221,7 +221,9 @@ int listenfd; //被动套接字(文件描述符），即只可以accept, 监听�
  	    	
 
 //将网卡信息结构体数组发送给qt客户端
-
+			char tmpbuf[1024];
+			memcpy(tmpbuf,&macList,sizeof(macList));
+			write(conn,tmpbuf,sizeof(macList));
 			
 
 

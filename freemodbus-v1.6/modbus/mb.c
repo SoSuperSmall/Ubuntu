@@ -82,7 +82,7 @@ static enum
 
 struct msgstr{
 	long type;
-	char ip[19];
+	char ip[16];
 };
 int res;
 extern int pipe_fd[2];

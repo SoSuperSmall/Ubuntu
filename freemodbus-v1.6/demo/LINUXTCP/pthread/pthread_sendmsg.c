@@ -219,7 +219,7 @@ void sendmsgs(){
                          {
 								 close(pipe_fd[1]);
                                  read(pipe_fd[0],readbuf,sizeof(readbuf));
-								 char p[19];
+								 char p[16];
 								 int i;
 								 struct sockaddr_in peeraddr;
 								 int len = sizeof(peeraddr);
