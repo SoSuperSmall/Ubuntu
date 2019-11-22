@@ -1,0 +1,5 @@
+修改和添加的内容有注释分割
+pthread_modbus.h中有修改
+pthread_modbus.c中有添加
+main.c中写有epoll监听管道
+
