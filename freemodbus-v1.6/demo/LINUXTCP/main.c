@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <malloc.h>
 //添加消息队列头文件
 #include <sys/types.h>
 #include <sys/ipc.h>
@@ -38,6 +39,15 @@ struct header
 	short length;
 	char tdata[526];
 };
+
+//定义发送结构体
+struct sendhead
+{
+	short type;
+	short length;
+	char sdata[0];
+};
+
 //定义消息定义
 struct msbuf
 {
@@ -92,6 +102,7 @@ void InitArray()
 		strcpy(macList[j].ipaddr,"1");
 	}
 }
+
 
 void addList(char name[],char ip[])
 {
@@ -221,9 +232,15 @@ int listenfd; //被动套接字(文件描述符），即只可以accept, 监听�
  	    	
 
 //将网卡信息结构体数组发送给qt客户端
-			char tmpbuf[1024];
-			memcpy(tmpbuf,&macList,sizeof(macList));
-			write(conn,tmpbuf,sizeof(macList));
+			char tmpbuf[1052];
+			//memcpy(tmpbuf,&macList,sizeof(macList));
+			//write(conn,tmpbuf,sizeof(macList));
+			struct sendhead *sh = (struct sendhead *)malloc(sizeof(struct sendhead)+sizeof(macList));
+			sh->type = 1;
+			sh->length = sizeof(macList);
+			memcpy(sh->sdata,&macList,sizeof(macList));
+			memcpy(tmpbuf,sh,sizeof(struct sendhead)+sizeof(macList));
+			write(conn,tmpbuf,1052);
 			
 
 

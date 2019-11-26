@@ -398,7 +398,7 @@ int ret_valu;
 			int msgid;
 			msgid = msgget(0x1000,IPC_CREAT | 0666);
 			msgrcv(msgid,&mb,sizeof(mb.ip),1,0);
-			//printf("ip=%s\n",mb.ip);
+			printf("ip=%s\n",mb.ip);
 			strcpy(temp,mb.ip);
 			a = 1;
 	

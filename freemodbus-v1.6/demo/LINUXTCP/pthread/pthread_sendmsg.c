@@ -16,10 +16,19 @@ int pipe_fd[2];
 
 void sendmsgs();
 void tcp();
+
+//发送结构体
+struct sendhead
+{
+	short type;
+	short length;
+	char sdata[0];
+};
+
 struct msgstr  
 {  
    long msgtype;  
-   char msgtext[2048];   
+   char msgtext[100];   
 }; 
 void *pthread_sendmsg(void *arg)
 {
@@ -223,7 +232,7 @@ void sendmsgs(){
 								 int i;
 								 struct sockaddr_in peeraddr;
 								 int len = sizeof(peeraddr);
-								 for(i = 0;i<(sizeof(client)/sizeof(client[0]));i++)
+								 for(i = 0;i<8;i++)
 								 {
 										 if(client[i] == -1)
 												 break;
@@ -232,7 +241,13 @@ void sendmsgs(){
 										 //printf("addr= %s,p = %s\n",inet_ntoa(peeraddr.sin_addr),p);
 										 if(strcmp(inet_ntoa(peeraddr.sin_addr),p) == 0)
 										 {
-												 write(client[i],readbuf,strlen(readbuf));
+												 struct sendhead *sh = (struct snedhead *)malloc(sizeof(struct sendhead)+sizeof(readbuf));
+												 sh->length = sizeof(readbuf);
+												 sh->type = 2;
+												 memcpy(sh->sdata,&readbuf,sizeof(readbuf));
+												 char tmpbuf[1052];
+												 memcpy(tmpbuf,sh,sizeof(struct sendhead)+sizeof(readbuf));
+												 write(client[i],tmpbuf,sizeof(tmpbuf));
 										 }
 								 }
 								 //write(conn,readbuf,strlen(readbuf));
