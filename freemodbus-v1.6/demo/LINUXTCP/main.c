@@ -17,6 +17,10 @@
 #include <arpa/inet.h>
 #include <string.h>
 
+//获取网卡状态所需头文件
+#include <sys/ioctl.h>
+#include <linux/if.h>
+#include <sys/socket.h>
 
 
 #define ERR_EXIT(m) \
@@ -87,6 +91,7 @@ struct mac
 {
 	char name[10];
 	char ipaddr[16];
+	short status;              //网卡状态
 }strmac;
 
 struct mac macList[6];         //结构体数组，存储多个网卡信息
@@ -100,6 +105,41 @@ void InitArray()
 	{
 		strcpy(macList[j].name,"1");
 		strcpy(macList[j].ipaddr,"1");
+		strcpy(macList[j].ipaddr,"4");
+	}
+}
+
+
+//检测网卡是否被占用
+char *net_detect(char *net_name)
+{
+	int skfd = 0;
+	struct ifreq ifr;
+
+	skfd = socket(AF_INET,SOCK_DGRAM,0);
+	if(skfd < 0)
+	{
+		printf("%s:%d Open socket error!\n",__FILE__,__LINE__);
+		return NULL;
+	}
+
+	strcpy(ifr.ifr_name,net_name);
+
+	if(ioctl(skfd,SIOCGIFFLAGS,&ifr)<0)
+	{
+		printf("%s:%d IOCTL error!\n",__FILE__,__LINE__);
+		printf("Maybe ethernet interface %s is not valid!",ifr.ifr_name);
+		close(skfd);
+		return NULL;
+	}
+
+	if(ifr.ifr_flags & IFF_RUNNING)
+	{
+		return "UP";
+	}
+	else
+	{
+		return "DOWN";
 	}
 }
 
@@ -110,12 +150,22 @@ void addList(char name[],char ip[])
 		printf("数组已满，无法存储网卡信息!\n");
 	else
 	{
+		if(strcmp(net_detect(name),"UP") == 0)
+		{
+			macList[c].status = 1;
+		}
+		else
+		{
+			macList[c].status = 4;
+		}
 		strcpy(macList[c].name,name);
 		strcpy(macList[c].ipaddr,ip);
 		c++;
 	}
 
 }
+
+
 
 //获取网卡和IP函数
 int get_local_ip(char *ip)
